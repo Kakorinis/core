@@ -15,7 +15,7 @@ from aio_pika.channel import Queue
 from core.logger import AppLogger
 from pydantic import BaseModel
 
-from settings import common_settings
+from core.settings import common_settings
 from .common import create_rabbit_channel
 
 

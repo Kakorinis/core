@@ -23,3 +23,9 @@ class CoreSettings(BaseSettings):
     SQL_DSN: str = 'postgresql+asyncpg://user:pwd@localhost:port/postgres'
     SQL_SCHEMA: str = 'public'
     IS_DB_INIT_NECESSARY: bool = True  # Флаг необходимости наполнения БД значениями по умолчанию
+
+    # rabbit
+    LOGGING_QUEUE_NAME: str = 'LogQueue'
+
+
+base_settings = CoreSettings()

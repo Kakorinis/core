@@ -15,7 +15,7 @@ from aio_pika.channel import Queue
 from core.logger import AppLogger
 from pydantic import BaseModel
 
-from core.settings import common_settings
+from core.settings import base_settings
 from .common import create_rabbit_channel
 
 
@@ -93,7 +93,7 @@ class RabbitBase:
                 dumps(error_info).encode('utf-8'),
                 delivery_mode=DeliveryMode.NOT_PERSISTENT
             ),
-            routing_key=common_settings.LOGGING_QUEUE_NAME
+            routing_key=base_settings.LOGGING_QUEUE_NAME
         )
 
     def convert_data_to_message_sending_type(self, data_schema: BaseModel, convert_data_type: str) -> Message:

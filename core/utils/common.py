@@ -33,6 +33,8 @@ def create_app(depends_container: Type[containers.DeclarativeContainer], routers
 
     # FastAPI и Starlette реализуют OPTIONS поддержку, но в запросах должны быть установлены оба заголовка Origin и Access-Control-Request-Method
     # https://github.com/fastapi/fastapi/issues/1849
+    # from starlette.middleware import Middleware
+    # from starlette.middleware.cors import CORSMiddleware
     # origins = ["http://newstyle.ru:8092"]
     # middleware = [
     #     Middleware(

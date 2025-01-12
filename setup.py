@@ -14,7 +14,7 @@ setup(
     url='https://github.com/kakorinis/core.git',
     keywords='core',
     description='Core for microservices',
-    long_description='Core for SSP microservices',
+    long_description='Core for microservices',
     long_description_content_type='text/markdown',
     packages=packages,
     package_data={package: ['py.typed'] for package in packages},

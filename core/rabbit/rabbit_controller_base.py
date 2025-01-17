@@ -82,7 +82,5 @@ class RabbitControllerBase:
             if not self.exchange_to_send_own_event:
                 await self.init()
 
-            to_send = data_schema
-            if convert_data_type:
-                to_send = self.rabbit.convert_data_to_message_sending_type(data_schema, convert_data_type)
+            to_send = self.rabbit.convert_data_to_message_sending_type(data_schema, convert_data_type)
             await self.exchange_to_send_own_event.publish(to_send, routing_key=routing_key)

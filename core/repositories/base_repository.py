@@ -23,7 +23,7 @@ class BaseRepository:
         self.with_id_dto = with_id_dto
 
     async def get_one_by_id(self, id_: int) -> BaseSchema | None:
-        async with self.session_maker as session:
+        async with self.session_maker() as session:
             stmt = select(self.table_model).where(self.table_model.id == id_)
             model = await session.scalar(stmt)
             if not model:

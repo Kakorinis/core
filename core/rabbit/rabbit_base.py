@@ -96,7 +96,11 @@ class RabbitBase:
             routing_key=base_settings.LOGGING_QUEUE_NAME
         )
 
-    def convert_data_to_message_sending_type(self, data_schema: BaseModel, convert_data_type: str) -> Message:
+    def convert_data_to_message_sending_type(
+            self,
+            data_schema: BaseModel,
+            convert_data_type: Optional[str] == None
+    ) -> Message:
         """
         Метод конвертации данных в необходимый формат для передачи через aio_pika.IncomingMessage.
         На данный момент реализован для json, остальные типы будут добавляться по необходимости.
@@ -105,9 +109,8 @@ class RabbitBase:
         :return: закодированное сообщение в байтах.
         :exception: NotImplementedError в случаях, когда метод вызывается с нереализованным типом конвертации данных.
         """
+        to_send = data_schema
         if convert_data_type == 'json':
             to_send = data_schema.json()
             to_send = dumps(to_send).encode('utf-8')
-            return Message(to_send, delivery_mode=DeliveryMode.PERSISTENT)
-
-        raise NotImplementedError
+        return Message(to_send, delivery_mode=DeliveryMode.PERSISTENT)

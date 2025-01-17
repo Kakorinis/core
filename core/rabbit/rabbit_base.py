@@ -14,7 +14,8 @@ from aio_pika.abc import AbstractQueue
 from aio_pika.channel import Queue
 from core.logger import AppLogger
 from pydantic import BaseModel
-
+from pickle import dumps as pickle_dumps
+from pickle import loads as pickle_loads
 from core.settings import base_settings
 from .common import create_rabbit_channel
 
@@ -52,7 +53,8 @@ class RabbitBase:
             async for message in iterator:
                 try:
                     async with message.process(ignore_processed=True):  # не делать ничего если сообщение уже обработано
-                        message_ = loads(loads(message.body.decode()))
+                        # message_ = loads(loads(message.body.decode()))
+                        message_ = pickle_loads(message.body)
                         await do_something(message_)
                         await message.ack()
 
@@ -109,8 +111,9 @@ class RabbitBase:
         :return: закодированное сообщение в байтах.
         :exception: NotImplementedError в случаях, когда метод вызывается с нереализованным типом конвертации данных.
         """
-        to_send = data_schema
         if convert_data_type == 'json':
             to_send = data_schema.json()
             to_send = dumps(to_send).encode('utf-8')
+        else:
+            to_send = pickle_dumps(data_schema)
         return Message(to_send, delivery_mode=DeliveryMode.PERSISTENT)

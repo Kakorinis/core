@@ -40,9 +40,14 @@ class RabbitControllerBase:
             привязки очереди к обменнику, без использования контроллером обменника напрямую.
             """
             if not self.queue_for_listening_events_from_another_one_service:
+                await self.rabbit.declare_exchange(
+                    exchange_name=self.queue_and_exchange_event_schema.depends_on_exchange
+                )
+                AppLogger.info(f'Обменник: {self.queue_and_exchange_event_schema.depends_on_exchange} объявлен')
                 self.queue_for_listening_events_from_another_one_service = await self.rabbit.declare_queue(
                     queue_name=self.queue_and_exchange_event_schema.queue,
                     exchange_name=self.queue_and_exchange_event_schema.depends_on_exchange)
+                AppLogger.info(f'Очередь: {self.queue_and_exchange_event_schema.queue} объявлена')
         except Exception as e:
             AppLogger.error(e.__str__())
             await self.rabbit.reconnect_channel()
@@ -51,6 +56,7 @@ class RabbitControllerBase:
             self.exchange_to_send_own_event = await self.rabbit.declare_exchange(
                 exchange_name=self.exchange_name_to_send_own_event
             )
+            AppLogger.info(f'Обменник: {self.exchange_name_to_send_own_event} объявлен')
 
     async def consume_queue_for_events_from_another_service(self) -> None:
         """
@@ -61,8 +67,9 @@ class RabbitControllerBase:
         await self.init()
         await self.rabbit.consume_queue(
             queue_instance=self.queue_for_listening_events_from_another_one_service,
-            do_something=self.queue_and_exchange_event_schema.function
+            do_something=self.queue_and_exchange_event_schema.function  # TODO убрать заглушку т.к. в конструкторе сервиса меняю метод
         )
+        AppLogger.info(f'Запущена работа очереди: {self.queue_and_exchange_event_schema.queue}')
 
     async def publish_new_own_event(
             self,
@@ -84,3 +91,4 @@ class RabbitControllerBase:
 
             to_send = self.rabbit.convert_data_to_message_sending_type(data_schema, convert_data_type)
             await self.exchange_to_send_own_event.publish(to_send, routing_key=routing_key)
+            AppLogger.info(f'В обменник {self.exchange_name_to_send_own_event} отправлено сообщение:\n{data_schema}')

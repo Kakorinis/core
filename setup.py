@@ -8,7 +8,7 @@ with open('requirements.txt', 'r', encoding='UTF-8') as f:
 
 setup(
     name='core',
-    version='1.1.2',
+    version='1.1.3',
     author='Kakorinis',
     author_email='newstyle-ps@yandex.ru',
     url='https://github.com/kakorinis/core.git',

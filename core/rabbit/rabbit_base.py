@@ -38,6 +38,7 @@ class RabbitBase:
         Метод вызывается в контроллере.
         """
         self.channel = await create_rabbit_channel(self.rabbitmq_async_connection)
+        AppLogger.info('Перезапуск соединения после ошибки')
 
     @staticmethod
     async def consume_queue(queue_instance: Queue, do_something: Callable[[dict], Awaitable[None]]) -> None:
@@ -57,6 +58,7 @@ class RabbitBase:
                         message_ = pickle_loads(message.body)
                         await do_something(message_)
                         await message.ack()
+                        AppLogger.info(f'Сообщение:\n{message_}\nобработано')
 
                 except Exception as error:
                     AppLogger.error(repr(error))
@@ -77,8 +79,10 @@ class RabbitBase:
         :return: очередь.
         """
         queue = await self.channel.declare_queue(name=queue_name, durable=False)
+        AppLogger.info(f'Очередь {queue_name} инициализирована')
         if exchange_name:
             await queue.bind(exchange_name)
+            AppLogger.info(f'Очередь {queue_name} привязана к обменнику: {exchange_name}')
         return queue
 
     async def publish_to_logging_queue(self, mess_obj, error_info) -> None:
@@ -98,8 +102,8 @@ class RabbitBase:
             routing_key=base_settings.LOGGING_QUEUE_NAME
         )
 
+    @staticmethod
     def convert_data_to_message_sending_type(
-            self,
             data_schema: BaseModel,
             convert_data_type: Optional[str] == None
     ) -> Message:
